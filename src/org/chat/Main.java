@@ -3,8 +3,15 @@ package org.chat;
 import javafx.collections.ListChangeListener;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ListDataListener;
+import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.List;
@@ -13,21 +20,31 @@ public class Main extends JPanel{
     private JPanel Panel;
     private JTextField textField1;
     private JList list1;
-    private JTextArea textArea1;
+    private JTextPane textPane1;
     private Process client;
     ChatModel model;
-    Main() throws IOException{
+    Main(JFrame frame) throws IOException{
         this.client = createClient();
         InputStream inStream = client.getInputStream();
         OutputStream outStream = client.getOutputStream();
-
+        HTMLEditorKit kit = new HTMLEditorKit();
+        textPane1.setEditorKit(kit);
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body {font-family: consolas;}");
+        styleSheet.addRule("div {display: block}");
+        HTMLDocument doc = (HTMLDocument)kit.createDefaultDocument();
+        textPane1.setDocument(doc);
         this.model = new ChatModel(inStream, outStream, "Dimon666");
         model.messages.addListener(new ListChangeListener<String>() {
             @Override
             public void onChanged(Change<? extends String> c) {
                 c.next();
-                for(String s: c.getAddedSubList()){
-                    textArea1.append(s+"\n");
+                for(String m: c.getAddedSubList()) {
+                    try {
+                        doc.insertAfterEnd(doc.getCharacterElement(doc.getLength()), m+"<br>");
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
                 }
             }
         });
@@ -55,7 +72,7 @@ public class Main extends JPanel{
     }
     public static void main(String[] args) throws IOException{
         JFrame frame = new JFrame("Main");
-        Main app = new Main();
+        Main app = new Main(frame);
         frame.setContentPane(app.Panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

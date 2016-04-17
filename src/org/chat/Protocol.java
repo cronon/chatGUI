@@ -24,22 +24,35 @@ public class Protocol {
     }
     static String processOutput(String message){
         if(message.matches("^/.*")){
-            return command(message.substring(0));
+            return command(message.substring(1));
         } else {
             return "chat " + message;
         }
     }
     static String command(String command){
-        return "";
+        return "server " + command;
     }
     static void chat(String input, List<String> messages){
-        String line = input.replaceFirst("(^\\S+)", "<$1>");
-        messages.add(timestamp(line));
+        String line = input.replaceFirst("(^\\S+)", "&lt;$1&gt;");
+        messages.add(timestamp(smiles(line)));
+    }
+    static String smiles(String s){
+        s = s.replaceAll(":\\)", img("smile.png"));
+        s = s.replaceAll(":P", img("grimace.png"));
+        s = s.replaceAll(":\\(", img("unhappy.png"));
+        return s;
     }
     static String timestamp(String s){
         SimpleDateFormat formatter = new SimpleDateFormat("/HH:mm:ss/");
         String date = formatter.format(new Date());
         return date + " " + s;
+    }
+    static String span(String klass, String s){
+        return "<span class="+klass+">"+s+"</span>";
+    }
+    static String img(String src){
+        return "<img src=\"" + (new Protocol()).getClass().getClassLoader()
+                .getResource("images/"+src).toString()+"\" />";
     }
     static String server(String input, List<String> nicknames, List<String> messages) {
         if(input.matches("^nicknames .*")){
