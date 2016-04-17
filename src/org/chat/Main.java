@@ -23,7 +23,7 @@ public class Main extends JPanel{
     private JTextPane textPane1;
     private Process client;
     ChatModel model;
-    Main(JFrame frame) throws IOException{
+    Main() throws IOException{
         this.client = createClient();
         InputStream inStream = client.getInputStream();
         OutputStream outStream = client.getOutputStream();
@@ -72,7 +72,7 @@ public class Main extends JPanel{
     }
     public static void main(String[] args) throws IOException{
         JFrame frame = new JFrame("Main");
-        Main app = new Main(frame);
+        Main app = new Main();
         frame.setContentPane(app.Panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
